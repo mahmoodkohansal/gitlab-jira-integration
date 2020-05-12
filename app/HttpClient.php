@@ -42,7 +42,7 @@ class HttpClient
             'verify' => false,
             ]);
 
-        $response = $client->get($this->gitHost . '/api/v3/' . $uri, [
+        $response = $client->get($this->gitHost . '/api/v4/' . $uri, [
             'query' => [
                 'private_token' => $this->gitToken,
                 'per_page' => 10000

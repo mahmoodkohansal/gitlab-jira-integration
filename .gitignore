@@ -53,3 +53,5 @@ composer.lock
 *.log
 config.integration.json
 .env
+
+.idea

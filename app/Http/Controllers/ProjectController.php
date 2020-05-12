@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\JiraIntegrationException;
 use Log;
 
 use Laravel\Lumen\Routing\Controller as BaseController;
@@ -30,7 +31,7 @@ class ProjectController extends BaseController
     public function allProjects()
     {    
         $client = new HttpClient();
-        $body = $client->request('projects/all');
+        $body = $client->request('projects');
 
         dump($body);
     }
@@ -42,7 +43,7 @@ class ProjectController extends BaseController
     public function ownedProjects()
     {
         $client = new HttpClient();
-        $projects = $client->request('projects/owned');
+        $projects = $client->request('projects?owned=true');
 
         return $projects;
     }
@@ -68,8 +69,11 @@ class ProjectController extends BaseController
 
     /**
      * add or edit project hook settings
+     * @param Request $request
      * @param [Request] $request HTTP Request
      *
+     * @return false|string
+     * @throws JiraIntegrationException
      * @link(http://doc.gitlab.com/ce/api/projects.html#add-project-hook, link)
      */
     public function addOrEditProjectHooks(Request $request, $project_id = null)
