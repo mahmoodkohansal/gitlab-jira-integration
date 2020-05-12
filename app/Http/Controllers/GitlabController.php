@@ -108,13 +108,22 @@ class GitlabController extends BaseController
                     $ret = $issueService->addComment($issueKey, $comment);
                 } else //need issue transition
                 {
+                    # change transition
                     $transition = new Transition();
                     $transition->setTransitionName($transitionName);
                     $body = sprintf($message, $user['username'], $transitionName, $commit['url']);
                     $transition->setCommentBody($body);
                     $issueService = new IssueService(new DotEnvConfiguration(base_path()));
-                    Log::info('comment with transition ============>>>>>>>>>>>>>>>>>', [$issueKey, $transition]);
                     $issueService->transition($issueKey, $transition);
+
+                    # comment the transition
+                    Log::info('++++++++++++++++++++++++++++++++++++++++++++++++++++ ', $message);
+                    $comment = new Comment();
+                    $body = sprintf($message, $user['name'],  $commit['url'], $commit['message']);
+                    $comment->setBody($body);
+
+                    $issueService = new IssueService(new DotEnvConfiguration(base_path()));
+                    $ret = $issueService->addComment($issueKey, $comment);
                 }
 
             } catch (JIRAException $e) {
