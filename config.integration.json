@@ -7,7 +7,7 @@
         "message": "[~%s] Issue %s with %s",
         "keywords": [
             [
-                "Ready For Develop",
+                "Ready_for_Develop",
                 "[start|started]"
             ],
             [
@@ -19,7 +19,7 @@
                 "[close|closed]"
             ],
             [
-                "Ready For Test",
+                "Ready_For_Test",
                 "[developed]"
             ]
         ]
