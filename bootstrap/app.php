@@ -63,9 +63,9 @@ $app->middleware([
 //     // Laravel\Lumen\Http\Middleware\VerifyCsrfToken::class,
 ]);
 
-// $app->routeMiddleware([
-
-// ]);
+$app->routeMiddleware([
+    'log-requests' => App\Http\Middleware\LogRequestsMiddleware::class,
+]);
 
 /*
 |--------------------------------------------------------------------------
