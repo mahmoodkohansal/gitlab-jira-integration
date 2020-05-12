@@ -46,7 +46,7 @@ class GitlabController extends BaseController
 
         Log::info('eventType : ' . $eventType);
 
-        if ($eventType == 'Push Hook')
+        if ($eventType == 'Push Hook' || ($request->has('event_name') && $request->get('event_name') === 'push'))
         {
             return $this->pushHook($request);
         }
@@ -61,7 +61,7 @@ class GitlabController extends BaseController
         {
             return $this->noteHook($request);
         }
-        elseif ($eventType == 'Merge Request Hook'){
+        elseif ($eventType == 'Merge Request Hook' || ($request->has('event_type') && $request->get('event_type') === 'merge_request')){
             return $this->mergeRequestHook($request);
         }
 
