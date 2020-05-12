@@ -114,7 +114,9 @@ class GitlabController extends BaseController
                     $body = sprintf($message, $user['username'], $transitionName, $commit['url']);
                     $transition->setCommentBody($body);
                     $issueService = new IssueService(new DotEnvConfiguration(base_path()));
+                    Log::info('NEEEEW comment with transition ============>>>>>>>>>>>>>>>>>', [$issueKey, $transition]);
                     $issueService->transition($issueKey, $transition);
+
 
                     # comment the transition
                     Log::info('++++++++++++++++++++++++++++++++++++++++++++++++++++ ', $message);
