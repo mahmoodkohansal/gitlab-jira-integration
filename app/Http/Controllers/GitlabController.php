@@ -119,7 +119,7 @@ class GitlabController extends BaseController
 
 
                     # comment the transition
-                    Log::info('++++++++++++++++++++++++++++++++++++++++++++++++++++ ', $message);
+                    Log::info('++++++++++++++++++++++++++++++++++++++++++++++++++++ ', [$message]);
                     $comment = new Comment();
                     $body = sprintf($message, $user['name'],  $commit['url'], $commit['message']);
                     $comment->setBody($body);
