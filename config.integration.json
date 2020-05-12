@@ -20,15 +20,15 @@
             ],
             [
                 "Developed",
-                "[developed,done,finished]"
+                "[developed|done|finished]"
             ],
             [
                 "Tested",
-                "[test,tested]"
+                "[test|tested]"
             ],
             [
                 "Released",
-                "[deploy,deployed,release,released]"
+                "[deploy|deployed|release|released]"
             ]
         ]
     },
