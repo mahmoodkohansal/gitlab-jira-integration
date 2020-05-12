@@ -24,7 +24,7 @@ class GitlabController extends BaseController
     /**
      * process request from gitlab webhook.
      *
-     * @param  Request  $request
+     * @param Request $request
      * @return Response
      */
     public function hookHandler(Request $request)
@@ -36,32 +36,25 @@ class GitlabController extends BaseController
             dump($request);
         }
 
-        $eventType = $request->headers->get('X-Gitlab-Event') ;
+        $eventType = $request->headers->get('X-Gitlab-Event');
         if (is_null($eventType))
             $eventType = 'Push Hook';
 
-         // for debugging purpose.
+        // for debugging purpose.
         \Storage::put(str_replace(' ', '-', $eventType) . ".json",
             json_encode($request->json()->all(), JSON_PRETTY_PRINT));
 
         Log::info('eventType : ' . $eventType);
 
-        if ($eventType == 'Push Hook' || ($request->has('event_name') && $request->get('event_name') === 'push'))
-        {
+        if ($eventType == 'Push Hook' || ($request->has('event_name') && $request->get('event_name') === 'push')) {
             return $this->pushHook($request);
-        }
-        elseif ($eventType == 'Tag Push Hook')
-        {
+        } elseif ($eventType == 'Tag Push Hook') {
             return $this->tagPushHook($request);
-        }
-        elseif ($eventType == 'Issue Hook'){
+        } elseif ($eventType == 'Issue Hook') {
             return $this->issueHook($request);
-        }
-        elseif ($eventType == 'Note Hook')
-        {
+        } elseif ($eventType == 'Note Hook') {
             return $this->noteHook($request);
-        }
-        elseif ($eventType == 'Merge Request Hook' || ($request->has('event_type') && $request->get('event_type') === 'merge_request')){
+        } elseif ($eventType == 'Merge Request Hook' || ($request->has('event_type') && $request->get('event_type') === 'merge_request')) {
             return $this->mergeRequestHook($request);
         }
 
@@ -91,8 +84,7 @@ class GitlabController extends BaseController
         }
 
         $issueCount = 0;
-        foreach($commits as $commit)
-        {
+        foreach ($commits as $commit) {
             Log::debug('Commit : ' . json_encode($commit, JSON_PRETTY_PRINT));
 
             $issueKey = $this->extractIssueKey($commit['message']);
@@ -107,10 +99,9 @@ class GitlabController extends BaseController
 
             $transitionName = $this->needTransition($commit['message'], $message);
             try {
-                if (empty($transitionName))
-                {
+                if (empty($transitionName)) {
                     $comment = new Comment();
-                    $body = sprintf($message, $user['username'], $commit['url']);
+                    $body = sprintf($message, 'http://gitlab.azki.com/' . $user['username'], $user['name'],  $commit['url']);
                     $comment->setBody($body);
 
                     $issueService = new IssueService(new DotEnvConfiguration(base_path()));
@@ -126,27 +117,25 @@ class GitlabController extends BaseController
                 }
 
             } catch (JIRAException $e) {
-                 Log::error("add Comment Failed : " . $e->getMessage());
+                Log::error("add Comment Failed : " . $e->getMessage());
             }
         }
 
         return response()->json([
             'result' => 'Ok',
             'issue_count' => $issueCount
-            ]);
+        ]);
     }
 
     private function needTransition($subject, &$message)
     {
         //$filesystem = new \League\Flysystem\Filesystem(new \League\Flysystem\Adapter\Local(__DIR__));
-        $string = file_get_contents(base_path() . DIRECTORY_SEPARATOR  . 'config.integration.json');
+        $string = file_get_contents(base_path() . DIRECTORY_SEPARATOR . 'config.integration.json');
         $config = json_decode($string);
 
-        foreach($config->transition->keywords as $key)
-        {
-            $cnt = preg_match_all($key[1],  $subject, $matches);
-            if ($cnt > 0)
-            {
+        foreach ($config->transition->keywords as $key) {
+            $cnt = preg_match_all($key[1], $subject, $matches);
+            if ($cnt > 0) {
                 // matched. get keyword('Resolved', 'Closed')
                 $message = $config->transition->message;
                 return $key[0];
@@ -154,10 +143,10 @@ class GitlabController extends BaseController
         }
 
         // Merge branch 'feature\/test-961' into develop\n",
-        $cnt = preg_match("/Merge\s+branch\s+'feature/i",  $subject, $matches);
+        $cnt = preg_match("/Merge\s+branch\s+'feature/i", $subject, $matches);
         if ($cnt > 0) {
-            $message =  str_replace("COMMIT_MESSAGE", $subject, $config->merging->message);
-        }else {
+            $message = str_replace("COMMIT_MESSAGE", $subject, $config->merging->message);
+        } else {
             $message = $config->referencing->message;
         }
         return null;
@@ -185,12 +174,12 @@ class GitlabController extends BaseController
 
     private function noteHook(Request $req)
     {
-         abort(500, 'Not Yet Implemented.');
+        abort(500, 'Not Yet Implemented.');
     }
 
-    private function mergeReqHook(Request $req)
+    private function mergeRequestHook(Request $req)
     {
-       abort(500, 'Not Yet Implemented.');
+        abort(500, 'Not Yet Implemented.');
     }
 
 

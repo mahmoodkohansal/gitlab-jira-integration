@@ -1,0 +1,35 @@
+{
+    "accept.host": [
+        "localhost",
+        "79.127.125.185"
+    ],
+    "transition": {
+        "message": "[~%s] Issue %s with %s",
+        "keywords": [
+            [
+                "Start",
+                "[start|started]"
+            ],
+            [
+                "Stop",
+                "[stop|stopped]"
+            ],
+            [
+                "Close",
+                "[close|closed]"
+            ],
+            [
+                "Developed",
+                "[developed]"
+            ]
+        ]
+    },
+    "referencing": {
+        "message": "<a href='%s'>%s</a> mentioned this issue in %s"
+    },
+    "merging": {
+        "message": "[~%s] COMMIT_MESSAGE with %s"
+    }
+}
+
+
