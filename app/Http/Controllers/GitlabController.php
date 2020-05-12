@@ -29,7 +29,6 @@ class GitlabController extends BaseController
      */
     public function hookHandler(Request $request)
     {
-        Log::debug('hook received');
         $clientIp = !empty($request->header('X-Forwarded-For')) ?: $request->ip();
         Log::debug('hook received from ' . $clientIp);
 

@@ -21,7 +21,8 @@ class LogRequestsMiddleware
      */
     public function handle($request, Closure $next)
     {
-        Log::info('Request Received', ['url' => $request->getRequestUri(), 'params' => $request->all()]);
+        Log::info('-------------------------------------------- NEW REQUEST --------------------------------------------');
+        Log::error('Request Received', ['url' => $request->getRequestUri(), 'params' => $request->all(), 'headers' => $request->headers]);
 
         return $next($request);
     }
