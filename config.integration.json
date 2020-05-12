@@ -25,7 +25,7 @@
         ]
     },
     "referencing": {
-        "message": "<a href='%s'>%s</a> mentioned this issue in %s"
+        "message": "%s mentioned this issue in %s : %s"
     },
     "merging": {
         "message": "[~%s] COMMIT_MESSAGE with %s"

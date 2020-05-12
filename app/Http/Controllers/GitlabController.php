@@ -101,7 +101,7 @@ class GitlabController extends BaseController
             try {
                 if (empty($transitionName)) {
                     $comment = new Comment();
-                    $body = sprintf($message, 'http://gitlab.azki.com/' . $user['username'], $user['name'],  $commit['url']);
+                    $body = sprintf($message, $user['name'],  $commit['url'], $commit['message']);
                     $comment->setBody($body);
 
                     $issueService = new IssueService(new DotEnvConfiguration(base_path()));
