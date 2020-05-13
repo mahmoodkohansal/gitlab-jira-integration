@@ -101,7 +101,7 @@ class GitlabController extends BaseController
             try {
                 if (empty($transitionName)) {
                     $comment = new Comment();
-                    $body = sprintf($message, $user['name'],  $commit['url'], $commit['message']);
+                    $body = sprintf($message, $user['name'], $commit['url'], $commit['message']);
                     $comment->setBody($body);
 
                     $issueService = new IssueService(new DotEnvConfiguration(base_path()));
@@ -122,6 +122,14 @@ class GitlabController extends BaseController
                     Log::info('++++++++++++++++++++++++++++++++++++++++++++++++++++ ', [$message]);
                     $comment = new Comment();
                     $body = sprintf($message, $user['name'], $transitionName, $commit['message']);
+                    $comment->setBody($body);
+
+                    $issueService = new IssueService(new DotEnvConfiguration(base_path()));
+                    $ret = $issueService->addComment($issueKey, $comment);
+
+                    # comment message in commit
+                    $comment = new Comment();
+                    $body = $user['name'] . ' commented in push : ' . $commit['message'];
                     $comment->setBody($body);
 
                     $issueService = new IssueService(new DotEnvConfiguration(base_path()));

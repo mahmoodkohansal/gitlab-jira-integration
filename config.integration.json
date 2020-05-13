@@ -4,7 +4,7 @@
         "79.127.125.185"
     ],
     "transition": {
-        "message": "%s change issue status to %s",
+        "message": "%s changed issue status to %s",
         "keywords": [
             [
                 "Started",
