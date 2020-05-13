@@ -199,8 +199,6 @@ class GitlabController extends BaseController
 
     private function mergeRequestHook(Request $request)
     {
-        Log::info('MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERGEEEEEEEEEEEEEEEEEEEEEEEEEE REQUEST', $request);
-
         $userController = new UserController();
 
         $hook = $request->json();
