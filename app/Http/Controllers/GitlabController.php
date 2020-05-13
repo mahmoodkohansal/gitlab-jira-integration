@@ -232,7 +232,7 @@ class GitlabController extends BaseController
 
                 # comment the transition
                 $comment = new Comment();
-                $body = $user['name'] . 'accept merge request ' . $merge_attributes['url'];
+                $body = $user['name'] . ' accepted merge request ' . $merge_attributes['url'];
                 $comment->setBody($body);
 
                 $issueService = new IssueService(new DotEnvConfiguration(base_path()));
