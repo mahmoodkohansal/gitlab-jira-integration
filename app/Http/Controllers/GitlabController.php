@@ -87,57 +87,60 @@ class GitlabController extends BaseController
         foreach ($commits as $commit) {
             Log::debug('Commit : ' . json_encode($commit, JSON_PRETTY_PRINT));
 
-            $issueKey = $this->extractIssueKey($commit['message']);
-            if (empty($issueKey)) {
+            $issueKeys = $this->extractIssueKeys($commit['message']);
+            if (empty($issueKeys)) {
                 Log::debug('Can\'t found issue Key in commit message : ' . $commit['message']);
                 continue;
             }
 
-            Log::debug("Found found issue Key($issueKey) in commit message : " . $commit['message']);
+            Log::debug("Found found issue Keys(" . implode(', ', $issueKeys). ") in commit message : " . $commit['message']);
 
             $issueCount++;
 
             $transitionName = $this->needTransition($commit['message'], $message);
-            try {
-                if (empty($transitionName)) {
-                    $comment = new Comment();
-                    $body = sprintf($message, $user['name'], $commit['url'], $commit['message']);
-                    $comment->setBody($body);
 
-                    $issueService = new IssueService(new DotEnvConfiguration(base_path()));
-                    $ret = $issueService->addComment($issueKey, $comment);
-                } else //need issue transition
-                {
-                    # change transition
-                    $transition = new Transition();
-                    $transition->setTransitionName($transitionName);
-                    $body = sprintf($message, $user['username'], $transitionName, $commit['url']);
-                    $transition->setCommentBody($body);
-                    $issueService = new IssueService(new DotEnvConfiguration(base_path()));
-                    Log::info('NEEEEW comment with transition ============>>>>>>>>>>>>>>>>>', [$issueKey, $transition]);
-                    $issueService->transition($issueKey, $transition);
+            foreach ($issueKeys as $issueKey) {
+                try {
+                    if (empty($transitionName)) {
+                        $comment = new Comment();
+                        $body = sprintf($message, $user['name'], $commit['url'], $commit['message']);
+                        $comment->setBody($body);
+
+                        $issueService = new IssueService(new DotEnvConfiguration(base_path()));
+                        $ret = $issueService->addComment($issueKey, $comment);
+                    } else //need issue transition
+                    {
+                        # change transition
+                        $transition = new Transition();
+                        $transition->setTransitionName($transitionName);
+                        $body = sprintf($message, $user['username'], $transitionName, $commit['url']);
+                        $transition->setCommentBody($body);
+                        $issueService = new IssueService(new DotEnvConfiguration(base_path()));
+                        Log::info('NEEEEW comment with transition ============>>>>>>>>>>>>>>>>>', [$issueKey, $transition]);
+                        $issueService->transition($issueKey, $transition);
 
 
-                    # comment the transition
-                    Log::info('++++++++++++++++++++++++++++++++++++++++++++++++++++ ', [$message]);
-                    $comment = new Comment();
-                    $body = sprintf($message, $user['name'], $transitionName, $commit['message']);
-                    $comment->setBody($body);
+                        # comment the transition
+                        Log::info('++++++++++++++++++++++++++++++++++++++++++++++++++++ ', [$message]);
+                        $comment = new Comment();
+                        $body = sprintf($message, $user['name'], $transitionName, $commit['message']);
+                        $comment->setBody($body);
 
-                    $issueService = new IssueService(new DotEnvConfiguration(base_path()));
-                    $ret = $issueService->addComment($issueKey, $comment);
+                        $issueService = new IssueService(new DotEnvConfiguration(base_path()));
+                        $ret = $issueService->addComment($issueKey, $comment);
 
-                    # comment message in commit
-                    $comment = new Comment();
-                    $body = $user['name'] . ' commented this issue in ' . $commit['url'] . ' : ' . $commit['message'];
-                    $comment->setBody($body);
+                        # comment message in commit
+                        $comment = new Comment();
+                        $body = $user['name'] . ' commented this issue in ' . $commit['url'] . ' : ' . $commit['message'];
+                        $comment->setBody($body);
 
-                    $issueService = new IssueService(new DotEnvConfiguration(base_path()));
-                    $ret = $issueService->addComment($issueKey, $comment);
+                        $issueService = new IssueService(new DotEnvConfiguration(base_path()));
+                        $ret = $issueService->addComment($issueKey, $comment);
+                    }
+
+                } catch (JIRAException $e) {
+                    Log::error("add Comment Failed : " . $e->getMessage());
                 }
-
-            } catch (JIRAException $e) {
-                Log::error("add Comment Failed : " . $e->getMessage());
             }
         }
 
@@ -172,14 +175,14 @@ class GitlabController extends BaseController
         return null;
     }
 
-    private function extractIssueKey($subject)
+    private function extractIssueKeys($subject)
     {
         $pattern = '([a-zA-Z]+-[0-9]+)';
         $cnt = preg_match_all($pattern, $subject, $matches);
         if ($cnt == 0)
             return null;
-        // return only first matched key.
-        return $matches[0][0];
+        // return array of issue keys
+        return $matches[0];
     }
 
     private function tagHook(Request $req)
@@ -209,35 +212,38 @@ class GitlabController extends BaseController
 
         Log::info('Merge Attributes', [$merge_attributes]);
 
-        $issueKey = $this->extractIssueKey($merge_attributes['title']);
+        $issueKeys = $this->extractIssueKeys($merge_attributes['title']);
         if (! empty($issueKey)) {
 
-            Log::debug("Found found issue Key($issueKey) in commit message : " . $merge_attributes['title']);
+            Log::debug("Found found issue Key(" . implode(', ', $issueKeys). ") in commit message : " . $merge_attributes['title']);
 
             if (
                 $merge_attributes['state'] === 'merged' &&
                 $merge_attributes['action'] === 'merge' &&
                 $merge_attributes['target_branch'] === 'production'
             ) {
+                foreach ($issueKeys as $issueKey) {
+                    try {
+                        # change transition to released
+                        $transition = new Transition();
+                        $transition->setTransitionName('Released');
+                        $body = $user['name'] . 'accept merge request ' . $merge_attributes['url'];
+                        $transition->setCommentBody($body);
+                        $issueService = new IssueService(new DotEnvConfiguration(base_path()));
+                        Log::info('NEEEEW comment with transition ============>>>>>>>>>>>>>>>>>', [$issueKey, $transition]);
+                        $issueService->transition($issueKey, $transition);
 
-                # change transition to released
-                $transition = new Transition();
-                $transition->setTransitionName('Released');
-                $body = $user['name'] . 'accept merge request ' . $merge_attributes['url'];
-                $transition->setCommentBody($body);
-                $issueService = new IssueService(new DotEnvConfiguration(base_path()));
-                Log::info('NEEEEW comment with transition ============>>>>>>>>>>>>>>>>>', [$issueKey, $transition]);
-                $issueService->transition($issueKey, $transition);
+                        # comment the transition
+                        $comment = new Comment();
+                        $body = $user['name'] . ' accepted merge request ' . $merge_attributes['url'];
+                        $comment->setBody($body);
 
-
-                # comment the transition
-                $comment = new Comment();
-                $body = $user['name'] . ' accepted merge request ' . $merge_attributes['url'];
-                $comment->setBody($body);
-
-                $issueService = new IssueService(new DotEnvConfiguration(base_path()));
-                $ret = $issueService->addComment($issueKey, $comment);
-
+                        $issueService = new IssueService(new DotEnvConfiguration(base_path()));
+                        $ret = $issueService->addComment($issueKey, $comment);
+                    } catch (JIRAException $e) {
+                        Log::error("add Comment Failed : " . $e->getMessage());
+                    }
+                }
             }
         }
     }
