@@ -213,7 +213,7 @@ class GitlabController extends BaseController
         Log::info('Merge Attributes', [$merge_attributes]);
 
         $issueKeys = $this->extractIssueKeys($merge_attributes['title']);
-        if (! empty($issueKey)) {
+        if (! empty($issueKeys)) {
 
             Log::debug("Found found issue Key(" . implode(', ', $issueKeys). ") in commit message : " . $merge_attributes['title']);
 
