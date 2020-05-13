@@ -211,7 +211,7 @@ class GitlabController extends BaseController
 
         $merge_attributes = $hook->get('object_attributes');
 
-        Log::info('Merge Attributes', $merge_attributes);
+        Log::info('Merge Attributes', [$merge_attributes]);
 
         $issueKey = $this->extractIssueKey($merge_attributes['title']);
         if (! empty($issueKey)) {
