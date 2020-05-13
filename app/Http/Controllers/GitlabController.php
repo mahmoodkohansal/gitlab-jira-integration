@@ -203,9 +203,7 @@ class GitlabController extends BaseController
 
         $hook = $request->json();
 
-        // call UserController's method using IoC.
-        $user = \App::make('App\Http\Controllers\UserController')
-            ->{'getGitUser'}($hook->get('user_id'));
+        $user = $hook->get('user');
 
         $merge_attributes = $hook->get('object_attributes');
 
