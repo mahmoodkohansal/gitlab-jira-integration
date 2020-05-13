@@ -129,7 +129,7 @@ class GitlabController extends BaseController
 
                     # comment message in commit
                     $comment = new Comment();
-                    $body = $user['name'] . ' commented in push : ' . $commit['message'];
+                    $body = $user['name'] . ' commented this issue in ' . $commit['url'] . ' : ' . $commit['message'];
                     $comment->setBody($body);
 
                     $issueService = new IssueService(new DotEnvConfiguration(base_path()));

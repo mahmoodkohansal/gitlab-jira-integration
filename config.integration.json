@@ -33,7 +33,7 @@
         ]
     },
     "referencing": {
-        "message": "%s mentioned this issue in %s : %s"
+        "message": "%s commented this issue in %s : %s"
     },
     "merging": {
         "message": "[~%s] COMMIT_MESSAGE with %s"
