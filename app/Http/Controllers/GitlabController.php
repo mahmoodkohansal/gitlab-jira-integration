@@ -197,9 +197,53 @@ class GitlabController extends BaseController
         abort(500, 'Not Yet Implemented.');
     }
 
-    private function mergeRequestHook(Request $req)
+    private function mergeRequestHook(Request $request)
     {
-        abort(500, 'Not Yet Implemented.');
+        Log::info('MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERGEEEEEEEEEEEEEEEEEEEEEEEEEE REQUEST', $request);
+
+        $userController = new UserController();
+
+        $hook = $request->json();
+
+        // call UserController's method using IoC.
+        $user = \App::make('App\Http\Controllers\UserController')
+            ->{'getGitUser'}($hook->get('user_id'));
+
+        $merge_attributes = $hook->get('object_attributes');
+
+        Log::info('Merge Attributes', $merge_attributes);
+
+        $issueKey = $this->extractIssueKey($merge_attributes['title']);
+        if (! empty($issueKey)) {
+
+            Log::debug("Found found issue Key($issueKey) in commit message : " . $merge_attributes['title']);
+
+            if (
+                $merge_attributes['state'] === 'merged' &&
+                $merge_attributes['action'] === 'merge' &&
+                $merge_attributes['target_branch'] === 'production'
+            ) {
+
+                # change transition to released
+                $transition = new Transition();
+                $transition->setTransitionName('Released');
+                $body = $user['name'] . 'accept merge request ' . $merge_attributes['url'];
+                $transition->setCommentBody($body);
+                $issueService = new IssueService(new DotEnvConfiguration(base_path()));
+                Log::info('NEEEEW comment with transition ============>>>>>>>>>>>>>>>>>', [$issueKey, $transition]);
+                $issueService->transition($issueKey, $transition);
+
+
+                # comment the transition
+                $comment = new Comment();
+                $body = $user['name'] . 'accept merge request ' . $merge_attributes['url'];
+                $comment->setBody($body);
+
+                $issueService = new IssueService(new DotEnvConfiguration(base_path()));
+                $ret = $issueService->addComment($issueKey, $comment);
+
+            }
+        }
     }
 
 

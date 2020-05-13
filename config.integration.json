@@ -8,27 +8,23 @@
         "keywords": [
             [
                 "Started",
-                "[start|started]"
+                "[start|started|Start|Started]"
             ],
             [
                 "Open",
-                "[stop|stopped]"
+                "[stop|stopped|Stop|Stopped]"
             ],
             [
                 "Closed",
-                "[close|closed]"
+                "[close|closed|Close|Closed]"
             ],
             [
                 "Developed",
-                "[developed|done|finished]"
+                "[develop|developed|done|finish|finished|Develop|Developed|Done|Finish|Finished]"
             ],
             [
                 "Tested",
-                "[test|tested]"
-            ],
-            [
-                "Released",
-                "[deploy|deployed|release|released]"
+                "[test|tested|Test|Tested]"
             ]
         ]
     },
